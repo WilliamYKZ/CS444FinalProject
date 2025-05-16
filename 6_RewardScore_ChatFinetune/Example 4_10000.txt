@@ -1,0 +1,870 @@
+# Full Generated Response
+
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set oLiChild = oIlList.Item(lLilResultLoop)
+        data = oLiChild.innerText
+        'data = data & vbCrLf & oLiChild.innerText
+        Range("B" & lLiResultLoop +1).Value = data
+        data = vbNullString
+    Next lLiResultLoop
+
+    Dim j As Long
+    Dim Ws As Worksheet
+    Dim rngDB As Range
+
+    Set Ws = ActiveSheet
+    Set oWord = CreateObject("Word.Application")
+    Set oWordDoc = oWord.Documents.Open("D:\Jahrestage Geschichte.docx")
+    iFirstRow = 1 ' "Ws.Cells(1, 2).End(xlDown).Row" used to work fine but suddenly gives same as iLastRow!
+    'Debug.Print iFirstRow
+    iLastRow = Ws.Cells(ActiveSheet.Rows.Count, "B").End(xlUp).Row
+    'Debug.Print iLastRow
+    oWord.Visible = True
+
+    With wordApp
+        With Ws
+            Set rngDB = Ws.Range(.Cells(iFirstRow, 2), .Cells(iLastRow, 2))
+        End With
+        rngDB.Cut
+        oWord.Selection.PasteSpecial DataType:=wdPasteText
+        oWord.Selection.TypeParagraph
+        oWord.Selection = ""
+    End With
+
+    oWordDoc.Close savechanges:=True
+    wordApp.Quit 'it doesn't :(
+End Sub
+```
+
+Description of General Idea/Final Project:
+-----------------------------------------
+The final project is supposed to have a worksheet for every month, each containing a table with a row for every day of the respective month and columns for the different categories according to the (sub-)titles. The Word-output in the code is just an early-stage by-product and something I will round off only if/when the main problem can be solved.
+
+Further Remarks:
+---------------
+This is my first contribution on SO. I'm an absolute beginner when it comes to VBA and web-scraping (or any kind of coding, scripting or programming for that matter), but I kind of got sucked into it and spent the better part of my winter holiday just to figure out the above code. I wouldn't have been able to accomplish even that poor piece of scripting without the invaluable knowledge shared with noobs like me by the cracks of SO. I've tried out various approaches but I always got stuck at some point, VBA triggering runtime errors and often Excel crashing. In particular, I wasn't able to implement the `nextSibling`/`previousSibling` methods or the `nodeName` selector successfully which I figure might be a promising approach to the problem. So any help or hint would be greatly appreciated!
+
+Working Solution:
+-----------------
+Thanks to the feedback on my question I finally managed to figure out a solution that does the job, although maybe not in the most elegant way. The only remaining problem is that strangely the `li-elements` of the last column are duplicated. So if anyone has a clue how to deal with that ...
+
+```vba
+Sub SliceHtmlByHeaderTypes4()
+    Dim http As Object, html As MSHTML.HTMLDocument
+    Dim sh As Worksheet
+    Set sh = ThisWorkbook.ActiveSheet
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    Set html = New MSHTML.HTMLDocument
+
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim hNodeList As Object
+    Dim startPos As Long, endPos As Long
+    Dim s As Integer, e As Integer
+
+    Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+    Debug.Print hNodeList.Length
+
+    Do While s < hNodeList.Length - 1
+        http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+        http.send
+        html.body.innerHTML = http.responseText
+        Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+        startPos = InStr(html.body.outerHTML, hNodeList.Item(s).outerHTML)
+        endPos = InStr(html.body.outerHTML, hNodeList.Item(s + 1).outerHTML)
+
+        If startPos > 0 And endPos > 0 And endPos > startPos Then
+            Dim strS As String
+            strS = Mid$(html.body.outerHTML, startPos, endPos - startPos + 1)
+        Else
+            MsgBox "Problem slicing string"
+            Stop
+            Exit Sub
+        End If
+
+        Dim liList As Object
+        html.body.innerHTML = strS
+        Set liList = html.getElementsByTagName("li")
+
+        If liList.Length > 0 Then
+            Dim i As Integer
+            Dim liText As String
+            Dim lc As Integer
+            Dim liRange As Range
+            lc = (Cells(2, Columns.Count).End(xlToLeft).Column) + 1
+            Set liRange = sh.Range(Cells(2, lc), Cells(2, lc))
+
+            For i = 0 To liList.Length - 1
+                On Error Resume Next
+                liText = liList.Item(i).innerText
+                liRange.Value = liRange.Value & liText & vbCrLf
+                liText = vbNullString
+            Next i
+
+            strS = vbNullString
+            startPos = 0
+            endPos = 0
+            hNodeList = ""
+            i = 0
+        End If
+        s = s + 1
+    Loop
+End Sub
+```
+I do not claim that this solution can be used as is for your needs, however, I would be glad to provide it and any minor editing to suit the situation to the best of my VBA ability, if you would like.
+
+## Segment 1 (score=-0.7354)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/
+
+## Segment 2 (score=-0.4160)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <
+
+## Segment 3 (score=-0.3552)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="m
+
+## Segment 4 (score=-0.2314)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="
+
+## Segment 5 (score=-0.1517)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/
+
+## Segment 6 (score=-0.1965)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set o
+
+## Segment 7 (score=-0.1530)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set oLiChild = oIlList.Item(lLilResultLoop)
+        data = oLiChild.innerText
+        'data = data & vbCrLf & oLiChild.innerText
+        Range("B" & lLiResultLoop +1).Value = data
+        data = vbNullString
+    Next lLiResultLoop
+
+    Dim j As Long
+    Dim Ws As Worksheet
+    Dim rngDB As Range
+
+    Set Ws = ActiveSheet
+    Set oWord = CreateObject("Word.Application")
+    Set oWordDoc = oWord.Documents.Open("D:\Jahrestage Geschichte.docx")
+    iFirstRow = 1 ' "Ws.Cells(1, 2).End(xlDown).Row" used to work fine but suddenly gives same as iLastRow!
+    'Debug.Print iFirstRow
+    iLastRow = Ws.Cells(ActiveSheet.Rows.Count, "B").End(xlUp).Row
+    'Debug.Print iLastRow
+    oWord.Visible = True
+
+    With wordApp
+        With Ws
+            Set rngDB = Ws.Range(.Cells(iFirstRow, 2), .Cells(iLastRow, 2))
+        End With
+        rngDB.Cut
+        oWord.Selection.PasteSpecial DataType:=wdPasteText
+        oWord.Selection.TypeParagraph
+        oWord.Selection = ""
+    End With
+
+    oWordDoc.Close savechanges:=True
+    wordApp.Quit 'it doesn't :(
+End Sub
+
+## Segment 8 (score=-0.2090)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set oLiChild = oIlList.Item(lLilResultLoop)
+        data = oLiChild.innerText
+        'data = data & vbCrLf & oLiChild.innerText
+        Range("B" & lLiResultLoop +1).Value = data
+        data = vbNullString
+    Next lLiResultLoop
+
+    Dim j As Long
+    Dim Ws As Worksheet
+    Dim rngDB As Range
+
+    Set Ws = ActiveSheet
+    Set oWord = CreateObject("Word.Application")
+    Set oWordDoc = oWord.Documents.Open("D:\Jahrestage Geschichte.docx")
+    iFirstRow = 1 ' "Ws.Cells(1, 2).End(xlDown).Row" used to work fine but suddenly gives same as iLastRow!
+    'Debug.Print iFirstRow
+    iLastRow = Ws.Cells(ActiveSheet.Rows.Count, "B").End(xlUp).Row
+    'Debug.Print iLastRow
+    oWord.Visible = True
+
+    With wordApp
+        With Ws
+            Set rngDB = Ws.Range(.Cells(iFirstRow, 2), .Cells(iLastRow, 2))
+        End With
+        rngDB.Cut
+        oWord.Selection.PasteSpecial DataType:=wdPasteText
+        oWord.Selection.TypeParagraph
+        oWord.Selection = ""
+    End With
+
+    oWordDoc.Close savechanges:=True
+    wordApp.Quit 'it doesn't :(
+End Sub
+```
+
+Description of General Idea/Final Project:
+-----------------------------------------
+The final project is supposed to have a worksheet for every month, each containing a table with a row for every day of the respective month and columns for the different categories according to the (sub-)titles. The Word-output in the code is just an early-stage by-product and something I will round off only if/when the main problem can be solved.
+
+Further Remarks:
+---------------
+This is my first contribution on SO. I'm an absolute beginner when it comes to VBA and web-scraping (or any kind of coding, scripting or programming for that matter), but I kind of got sucked into it and spent the better part of my winter holiday just to figure out the above code. I wouldn't have been able to accomplish even that poor piece of scripting without the invaluable knowledge shared with noobs like me by the cracks of SO. I've tried out various approaches but I always got stuck at some point, VBA triggering runtime errors and often Excel crashing. In particular, I wasn't able to implement the `nextSibling`/`previousSibling` methods or the `nodeName` selector successfully which I figure might be a promising approach to the problem. So any help or hint would be greatly appreciated!
+
+Working Solution:
+-----------------
+Thanks to the feedback on my question I finally managed to figure out a solution that does the job, although maybe not in the most elegant way. The only remaining problem is that strangely the `li-elements` of the last column are duplicated. So if anyone has
+
+## Segment 9 (score=-0.1096)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set oLiChild = oIlList.Item(lLilResultLoop)
+        data = oLiChild.innerText
+        'data = data & vbCrLf & oLiChild.innerText
+        Range("B" & lLiResultLoop +1).Value = data
+        data = vbNullString
+    Next lLiResultLoop
+
+    Dim j As Long
+    Dim Ws As Worksheet
+    Dim rngDB As Range
+
+    Set Ws = ActiveSheet
+    Set oWord = CreateObject("Word.Application")
+    Set oWordDoc = oWord.Documents.Open("D:\Jahrestage Geschichte.docx")
+    iFirstRow = 1 ' "Ws.Cells(1, 2).End(xlDown).Row" used to work fine but suddenly gives same as iLastRow!
+    'Debug.Print iFirstRow
+    iLastRow = Ws.Cells(ActiveSheet.Rows.Count, "B").End(xlUp).Row
+    'Debug.Print iLastRow
+    oWord.Visible = True
+
+    With wordApp
+        With Ws
+            Set rngDB = Ws.Range(.Cells(iFirstRow, 2), .Cells(iLastRow, 2))
+        End With
+        rngDB.Cut
+        oWord.Selection.PasteSpecial DataType:=wdPasteText
+        oWord.Selection.TypeParagraph
+        oWord.Selection = ""
+    End With
+
+    oWordDoc.Close savechanges:=True
+    wordApp.Quit 'it doesn't :(
+End Sub
+```
+
+Description of General Idea/Final Project:
+-----------------------------------------
+The final project is supposed to have a worksheet for every month, each containing a table with a row for every day of the respective month and columns for the different categories according to the (sub-)titles. The Word-output in the code is just an early-stage by-product and something I will round off only if/when the main problem can be solved.
+
+Further Remarks:
+---------------
+This is my first contribution on SO. I'm an absolute beginner when it comes to VBA and web-scraping (or any kind of coding, scripting or programming for that matter), but I kind of got sucked into it and spent the better part of my winter holiday just to figure out the above code. I wouldn't have been able to accomplish even that poor piece of scripting without the invaluable knowledge shared with noobs like me by the cracks of SO. I've tried out various approaches but I always got stuck at some point, VBA triggering runtime errors and often Excel crashing. In particular, I wasn't able to implement the `nextSibling`/`previousSibling` methods or the `nodeName` selector successfully which I figure might be a promising approach to the problem. So any help or hint would be greatly appreciated!
+
+Working Solution:
+-----------------
+Thanks to the feedback on my question I finally managed to figure out a solution that does the job, although maybe not in the most elegant way. The only remaining problem is that strangely the `li-elements` of the last column are duplicated. So if anyone has a clue how to deal with that ...
+
+```vba
+Sub SliceHtmlByHeaderTypes4()
+    Dim http As Object, html As MSHTML.HTMLDocument
+    Dim sh As Worksheet
+    Set sh = ThisWorkbook.ActiveSheet
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    Set html = New MSHTML.HTMLDocument
+
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim hNodeList As Object
+    Dim startPos As Long, endPos As Long
+    Dim s As Integer, e As Integer
+
+    Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+    Debug.Print hNodeList.Length
+
+    Do While s < hNodeList.Length - 1
+        http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+        http.send
+        html.body.innerHTML = http.responseText
+        Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+        startPos = InStr(html.body.outerHTML, hNodeList.Item(s).outerHTML)
+        endPos = InStr(html.body.outerHTML, hNodeList.Item(s + 1).outerHTML)
+
+        If startPos > 0 And endPos >
+
+## Segment 10 (score=-0.0022)
+Problem Description:
+--------------------
+I am looking for a way to access the `li`-elements between two specific heading-tags only (e.g., from 2nd `h3` to 3rd `h3` or from 3rd `h3` to next `h4`) in order to create a table of historical events listed on <https://de.wikipedia.org/wiki/1._Januar> structured along the criteria mentioned in the headings. A major problem (for me ...) is that - other than the `h1`-heading - the subtitles of the lower levels have no `className` or `id`.
+
+Sample of HTML:
+---------------
+```html
+<div class="mw-parser-output">
+    [...] 
+    </h3>
+    <ul>
+        <li><a href="/wiki/153_v._Chr." title="153 v. Chr.">153 v. Chr.</a>: Die <a href="/wiki/Consulat" title="Consulat">Konsuln</a> der <a href="/wiki/R%C3%B6mische_Republik" title="Römische Republik">römischen Republik</a> beginnen ihre Amtszeit erstmals am 1. Januar statt am 1. März; daher ist der 1. Januar heute der Jahresanfang.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/45_v._Chr." title="45 v. Chr.">45 v. Chr.</a>: <a href="/wiki/Kalenderreform_des_Gaius_Iulius_Caesar" title="Kalenderreform des Gaius Iulius Caesar">Caesars Reform</a> des <a href="/wiki/R%C3%B6mischer_Kalender" title="Römischer Kalender">römischen Kalenders</a> endet. Dieser wird ab 2. Januar 709 <a href="/wiki/Ab_urbe_condita_(Chronologie)" title="Ab urbe condita (Chronologie)">a. u. c.</a> durch den <a href="/wiki/Julianischer_Kalender" title="Julianischer Kalender">julianischen Kalender</a> ersetzt.</li>
+        <li><span style="visibility:hidden;">0</span><a href="/wiki/32_v._Chr." title="32 v. Chr.">32 v. Chr.</a>: <a href="/wiki/Augustus" title="Augustus">Oktavian</a> lässt sich vom <a href="/wiki/R%C3%B6mischer_Senat" title="Römischer Senat">Senat</a> zum „Führer Italiens“ (<i><a href="/wiki/Dux_(Titel)" title="Dux (Titel)">dux Italiae</a></i>) ausrufen. Er erklärt <a href="/wiki/Kleopatra_VII." title="Kleopatra VII.">Kleopatra</a> und damit <i><a href="/wiki/De_jure/de_facto" title="De jure/de facto">de facto</a></i> auch <a href="/wiki/Marcus_Antonius" title="Marcus Antonius">Marcus Antonius</a> den Krieg.</li>
+    </ul>
+    [...] 
+    </ul>
+    <h4><span id="Inkrafttreten_von_Gesetzen_und_Staatsvertr.C3.A4gen"></span><span class="mw-headline" id="Inkrafttreten_von_Gesetzen_und_Staatsverträgen">Inkrafttreten von Gesetzen und Staatsverträgen</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span> <a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=3" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Bearbeiten</a><span class="mw-editsection-divider"> | </span> <a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=3" title="Abschnitt bearbeiten: Inkrafttreten von Gesetzen und Staatsverträgen">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h4>
+    <p><i>Der 1. Januar wird oft für das Inkrafttreten von Gesetzen und Staatsverträgen verwendet. Das gilt unter anderem für:</i> </p>
+    <ul>
+        <li><a href="/wiki/1812" title="1812">1812</a>: das <i><a href="/wiki/Allgemeines_b%C3%BCrgerliches_Gesetzbuch" title="Allgemeines bürgerliches Gesetzbuch">Allgemeine bürgerliche Gesetzbuch</a></i> <i>(ABGB)</i> in den <a href="/wiki/Habsburgermonarchie#Erblande" title="Habsburgermonarchie">habsburgischen Erblanden</a>.</li>
+    </ul>
+    [...] 
+    </h4>
+    <p><i>Folgende Staaten erhalten am 1. Januar ihre Unabhängigkeit:</i> </p>
+    <ul>
+        [...] 
+    </ul>
+    <h3><span class="mw-headline" id="Wirtschaft">Wirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=6" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wirtschaft">Bearbeiten</a> <span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=6" title="Abschnitt bearbeiten: Wirtschaft">Quelltext bearbeiten</a><span class="mw-editsection-bracket">]</span></span> </h3>
+    <h4><span class="mw-headline" id="Wichtige_Ereignisse_in_der_Weltwirtschaft">Wichtige Ereignisse in der Weltwirtschaft</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=1._Januar&amp;veaction=edit&amp;section=7" class="mw-editsection-visualeditor" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Bearbeiten</a><span class="mw-editsection-divider"> | </span><a href="/w/index.php?title=1._Januar&amp;action=edit&amp;section=7" title="Abschnitt bearbeiten: Wichtige Ereignisse in der Weltwirtschaft">Quelltext bearbeiten</a> <span class="mw-editsection-bracket">]</span> </span> </h4>
+    <ul>
+        <li><a href="/wiki/1780" title="1780">1780</a>: In <a href="/wiki/Geschichte_Bratislavas" title="Geschichte Bratislavas">Preßburg</a> erscheint die erste ungarische Zeitung <i>Magyar hírmondó</i> („Ungarischer Kurier“).</li>
+    ```
+
+So far, I only managed to access **all** the `li`-elements (more than 1000!) that are not part of the table of contents with the following code:
+
+Experimental Code Example:
+--------------------------
+```vba
+Sub HistoricalEvents_Test()
+    Dim http As Object, html As New MSHTML.HTMLDocument
+    Dim oLiList As MSHTML.IHTMLDOMChildrenCollection
+    Dim data As String
+    Dim r As Integer
+    Dim oWord As Object, oWordDoc As Object
+    Dim wordApp As New Word.Application
+    Dim iFirstRow As Integer, iLastRow As Integer
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim lLiResultList As Long
+    Dim lLiResultLoop As Long
+    Set oLiList = html.querySelectorAll("#toc ~ ul li")
+
+    For lLiResultLoop = 0 To oLiList.Length - 1
+        Dim oLiChild As Object
+        Set oLiChild = oIlList.Item(lLilResultLoop)
+        data = oLiChild.innerText
+        'data = data & vbCrLf & oLiChild.innerText
+        Range("B" & lLiResultLoop +1).Value = data
+        data = vbNullString
+    Next lLiResultLoop
+
+    Dim j As Long
+    Dim Ws As Worksheet
+    Dim rngDB As Range
+
+    Set Ws = ActiveSheet
+    Set oWord = CreateObject("Word.Application")
+    Set oWordDoc = oWord.Documents.Open("D:\Jahrestage Geschichte.docx")
+    iFirstRow = 1 ' "Ws.Cells(1, 2).End(xlDown).Row" used to work fine but suddenly gives same as iLastRow!
+    'Debug.Print iFirstRow
+    iLastRow = Ws.Cells(ActiveSheet.Rows.Count, "B").End(xlUp).Row
+    'Debug.Print iLastRow
+    oWord.Visible = True
+
+    With wordApp
+        With Ws
+            Set rngDB = Ws.Range(.Cells(iFirstRow, 2), .Cells(iLastRow, 2))
+        End With
+        rngDB.Cut
+        oWord.Selection.PasteSpecial DataType:=wdPasteText
+        oWord.Selection.TypeParagraph
+        oWord.Selection = ""
+    End With
+
+    oWordDoc.Close savechanges:=True
+    wordApp.Quit 'it doesn't :(
+End Sub
+```
+
+Description of General Idea/Final Project:
+-----------------------------------------
+The final project is supposed to have a worksheet for every month, each containing a table with a row for every day of the respective month and columns for the different categories according to the (sub-)titles. The Word-output in the code is just an early-stage by-product and something I will round off only if/when the main problem can be solved.
+
+Further Remarks:
+---------------
+This is my first contribution on SO. I'm an absolute beginner when it comes to VBA and web-scraping (or any kind of coding, scripting or programming for that matter), but I kind of got sucked into it and spent the better part of my winter holiday just to figure out the above code. I wouldn't have been able to accomplish even that poor piece of scripting without the invaluable knowledge shared with noobs like me by the cracks of SO. I've tried out various approaches but I always got stuck at some point, VBA triggering runtime errors and often Excel crashing. In particular, I wasn't able to implement the `nextSibling`/`previousSibling` methods or the `nodeName` selector successfully which I figure might be a promising approach to the problem. So any help or hint would be greatly appreciated!
+
+Working Solution:
+-----------------
+Thanks to the feedback on my question I finally managed to figure out a solution that does the job, although maybe not in the most elegant way. The only remaining problem is that strangely the `li-elements` of the last column are duplicated. So if anyone has a clue how to deal with that ...
+
+```vba
+Sub SliceHtmlByHeaderTypes4()
+    Dim http As Object, html As MSHTML.HTMLDocument
+    Dim sh As Worksheet
+    Set sh = ThisWorkbook.ActiveSheet
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    Set html = New MSHTML.HTMLDocument
+
+    http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+    http.send
+    html.body.innerHTML = http.responseText
+
+    Dim hNodeList As Object
+    Dim startPos As Long, endPos As Long
+    Dim s As Integer, e As Integer
+
+    Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+    Debug.Print hNodeList.Length
+
+    Do While s < hNodeList.Length - 1
+        http.Open "GET", "https://de.wikipedia.org/wiki/1._Januar", False
+        http.send
+        html.body.innerHTML = http.responseText
+        Set hNodeList = html.querySelectorAll("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+        startPos = InStr(html.body.outerHTML, hNodeList.Item(s).outerHTML)
+        endPos = InStr(html.body.outerHTML, hNodeList.Item(s + 1).outerHTML)
+
+        If startPos > 0 And endPos > 0 And endPos > startPos Then
+            Dim strS As String
+            strS = Mid$(html.body.outerHTML, startPos, endPos - startPos + 1)
+        Else
+            MsgBox "Problem slicing string"
+            Stop
+            Exit Sub
+        End If
+
+        Dim liList As Object
+        html.body.innerHTML = strS
+        Set liList = html.getElementsByTagName("li")
+
+        If liList.Length > 0 Then
+            Dim i As Integer
+            Dim liText As String
+            Dim lc As Integer
+            Dim liRange As Range
+            lc = (Cells(2, Columns.Count).End(xlToLeft).Column) + 1
+            Set liRange = sh.Range(Cells(2, lc), Cells(2, lc))
+
+            For i = 0 To liList.Length - 1
+                On Error Resume Next
+                liText = liList.Item(i).innerText
+                liRange.Value = liRange.Value & liText & vbCrLf
+                liText = vbNullString
+            Next i
+
+            strS = vbNullString
+            startPos = 0
+            endPos = 0
+            hNodeList = ""
+            i = 0
+        End If
+        s = s + 1
+    Loop
+End Sub
+```
+I do not claim that this solution can be used as is for your needs, however, I would be glad to provide it and any minor editing to suit the situation to the best of my VBA ability, if you would like.
+

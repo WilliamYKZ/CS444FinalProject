@@ -1,0 +1,20 @@
+Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:17<00:00,  8.79s/it]
+Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at /home/exouser/Desktop/DeepSeek-R1-Distill-Qwen-7B and are newly initialized: ['score.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Device set to use cuda:0
+0it [00:00, ?it/s]You're using a Qwen2TokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/transformers/pipelines/text_classification.py:106: UserWarning: `return_all_scores` is now deprecated,  if want a similar functionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
+  warnings.warn(
+/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/bitsandbytes/autograd/_functions.py:315: UserWarning: MatMul8bitLt: inputs will be cast from torch.bfloat16 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/bitsandbytes/autograd/_functions.py:315: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+0it [01:56, ?it/s]
+Traceback (most recent call last):
+  File "/home/exouser/Desktop/20_Advantage/Experiment.py", line 233, in <module>
+    full_input_ids = torch.cat([question_tensors.to(device), response_tensors.to(device)], dim=1)
+AttributeError: 'list' object has no attribute 'to'
+Traceback (most recent call last):
+  File "/home/exouser/Desktop/20_Advantage/Experiment.py", line 233, in <module>
+    full_input_ids = torch.cat([question_tensors.to(device), response_tensors.to(device)], dim=1)
+AttributeError: 'list' object has no attribute 'to'

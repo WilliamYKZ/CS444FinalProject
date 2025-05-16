@@ -1,0 +1,15 @@
+{"time":"2025-03-21T14:02:55.675915045Z","level":"INFO","msg":"stream: starting","core version":"0.19.4","symlink path":"/home/exouser/Desktop/19_GPUUtlization/wandb/run-20250321_140255-nt3i72xg/logs/debug-core.log"}
+{"time":"2025-03-21T14:02:55.780866064Z","level":"INFO","msg":"created new stream","id":"nt3i72xg"}
+{"time":"2025-03-21T14:02:55.780908213Z","level":"INFO","msg":"stream: started","id":"nt3i72xg"}
+{"time":"2025-03-21T14:02:55.781025123Z","level":"INFO","msg":"handler: started","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:02:55.781048587Z","level":"INFO","msg":"writer: Do: started","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:02:55.781083754Z","level":"INFO","msg":"sender: started","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:02:55.984309312Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-21T14:03:14.00755434Z","level":"INFO","msg":"stream: closing","id":"nt3i72xg"}
+{"time":"2025-03-21T14:03:14.007686959Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-21T14:03:14.009381401Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-21T14:03:14.334068784Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-21T14:03:14.415348875Z","level":"INFO","msg":"handler: closed","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:03:14.415375274Z","level":"INFO","msg":"writer: Close: closed","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:03:14.415386245Z","level":"INFO","msg":"sender: closed","stream_id":"nt3i72xg"}
+{"time":"2025-03-21T14:03:14.415562567Z","level":"INFO","msg":"stream: closed","id":"nt3i72xg"}

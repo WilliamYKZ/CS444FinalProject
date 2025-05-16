@@ -1,0 +1,15 @@
+{"time":"2025-03-28T03:50:50.864222679Z","level":"INFO","msg":"stream: starting","core version":"0.19.4","symlink path":"/home/exouser/Desktop/20_Advantage/wandb/run-20250328_035050-lj997syx/logs/debug-core.log"}
+{"time":"2025-03-28T03:50:50.967626994Z","level":"INFO","msg":"created new stream","id":"lj997syx"}
+{"time":"2025-03-28T03:50:50.96766722Z","level":"INFO","msg":"stream: started","id":"lj997syx"}
+{"time":"2025-03-28T03:50:50.967731529Z","level":"INFO","msg":"writer: Do: started","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:50:50.96775317Z","level":"INFO","msg":"handler: started","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:50:50.967840704Z","level":"INFO","msg":"sender: started","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:50:51.247775185Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-28T03:51:10.10299817Z","level":"INFO","msg":"stream: closing","id":"lj997syx"}
+{"time":"2025-03-28T03:51:10.103059415Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-28T03:51:10.103765478Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-28T03:51:10.401342129Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-28T03:51:10.481821719Z","level":"INFO","msg":"handler: closed","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:51:10.481919592Z","level":"INFO","msg":"writer: Close: closed","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:51:10.481980837Z","level":"INFO","msg":"sender: closed","stream_id":"lj997syx"}
+{"time":"2025-03-28T03:51:10.48217935Z","level":"INFO","msg":"stream: closed","id":"lj997syx"}

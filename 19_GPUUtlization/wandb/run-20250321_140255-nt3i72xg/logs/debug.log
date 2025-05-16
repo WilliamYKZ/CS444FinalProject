@@ -1,0 +1,24 @@
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_setup.py:_flush():68] Current SDK version is 0.19.4
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_setup.py:_flush():68] Configure stats pid to 41718
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_setup.py:_flush():68] Loading settings from /home/exouser/.config/wandb/settings
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_setup.py:_flush():68] Loading settings from /home/exouser/Desktop/19_GPUUtlization/wandb/settings
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_init.py:setup_run_log_directory():624] Logging user logs to /home/exouser/Desktop/19_GPUUtlization/wandb/run-20250321_140255-nt3i72xg/logs/debug.log
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_init.py:setup_run_log_directory():625] Logging internal logs to /home/exouser/Desktop/19_GPUUtlization/wandb/run-20250321_140255-nt3i72xg/logs/debug-internal.log
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_init.py:init():743] calling init triggers
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_init.py:init():748] wandb.init called with sweep_config: {}
+config: {}
+2025-03-21 14:02:55,242 INFO    MainThread:41718 [wandb_init.py:init():776] starting backend
+2025-03-21 14:02:55,546 INFO    MainThread:41718 [wandb_init.py:init():780] sending inform_init request
+2025-03-21 14:02:55,671 INFO    MainThread:41718 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-03-21 14:02:55,672 INFO    MainThread:41718 [wandb_init.py:init():795] backend started and connected
+2025-03-21 14:02:55,677 INFO    MainThread:41718 [wandb_init.py:init():888] updated telemetry
+2025-03-21 14:02:55,678 INFO    MainThread:41718 [wandb_init.py:init():915] communicating run to backend with 90.0 second timeout
+2025-03-21 14:02:55,982 INFO    MainThread:41718 [wandb_init.py:init():967] starting run threads in backend
+2025-03-21 14:02:56,105 INFO    MainThread:41718 [wandb_run.py:_console_start():2409] atexit reg
+2025-03-21 14:02:56,105 INFO    MainThread:41718 [wandb_run.py:_redirect():2259] redirect: wrap_raw
+2025-03-21 14:02:56,105 INFO    MainThread:41718 [wandb_run.py:_redirect():2324] Wrapping output streams.
+2025-03-21 14:02:56,105 INFO    MainThread:41718 [wandb_run.py:_redirect():2349] Redirects installed.
+2025-03-21 14:02:56,107 INFO    MainThread:41718 [wandb_init.py:init():1009] run started, returning control to user process
+2025-03-21 14:02:56,108 INFO    MainThread:41718 [wandb_run.py:_config_callback():1270] config_cb None None {'trl_ppo_trainer_config': {'exp_name': 'Experiment', 'seed': 42, 'log_with': 'wandb', 'task_name': None, 'model_name': '/home/exouser/Desktop/0_ModelCheckpoint/Full_RL_Model/CheckPoint_500', 'query_dataset': 'stanfordnlp/imdb', 'reward_model': 'sentiment-analysis:lvwerra/distilbert-imdb', 'remove_unused_columns': True, 'tracker_project_name': 'trl', 'steps': 720, 'learning_rate': 1.4e-05, 'adap_kl_ctrl': True, 'init_kl_coef': 0.2, 'kl_penalty': 'kl', 'target': 6.0, 'horizon': 10000.0, 'gamma': 1.0, 'lam': 0.95, 'cliprange': 0.2, 'cliprange_value': 0.2, 'vf_coef': 0.1, 'batch_size': 8, 'forward_batch_size': None, 'mini_batch_size': 1, 'gradient_accumulation_steps': 8, 'world_size': 1, 'ppo_epochs': 4, 'max_grad_norm': None, 'optimize_cuda_cache': True, 'optimize_device_cache': False, 'early_stopping': False, 'target_kl': 0.1, 'compare_steps': 1, 'ratio_threshold': 10.0, 'use_score_scaling': False, 'use_score_norm': False, 'score_clip': None, 'whiten_rewards': False, 'gradient_checkpointing': False, 'is_encoder_decoder': False, 'is_peft_model': True, 'backward_batch_size': 8, 'global_backward_batch_size': 8, 'global_batch_size': 8, 'dataset_num_proc': None, 'total_ppo_epochs': 90}}
+2025-03-21 14:03:14,007 WARNING MsgRouterThr:41718 [router.py:message_loop():75] message_loop has been closed

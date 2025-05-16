@@ -1,0 +1,423 @@
+# Full Generated Response
+
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a PyTorch Fairseq `Criterion`.
+
+To add this extension, you would have to copy the code for `CrossEntropyCriterion` and make your new class a derivative of `CrossEntropyCriterion`.
+
+```python
+class your_criterion_class:
+    def __init__(self, model, criterion_params):
+        self.model = model
+        self.criterion_params = criterion_params
+    
+    def __call__(self, sample):
+        model_inputs = self.model.encode_batch(
+            input_ids=sample['input_ids'],
+            attention_mask=sample['attention_mask'],
+            decoder_input_ids=sample['decoder_input_ids'],
+            decoder_attention_mask=sample['decoder_attention_mask'],
+            doc_labels=sample['doc_labels'],
+            tgt_vocab_size=self.criterion_params.tgt_vocab_size,
+            lc_encoder_input_ids=sample['lc_encoder_input_ids'],
+            lc_encoder_attention_mask=sample['lc_encoder_attention_mask'],
+            lc_decoder_input_ids=sample['lc_decoder_input_ids'],
+            lc_decoder_attention_mask=sample['lc_decoder_attention_mask'],
+        )
+        criterion_output = self.model(model_inputs)
+        return criterion_output.log_prob
+
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+    
+    def forward(self, tgt_tokens=None, **kwargs):
+        criterion = CrossEntropyCriterion(self, **self.criterion_params)
+        return super().forward(tgt_tokens, **kwargs)
+
+## Segment 1 (score=-0.5234)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_
+
+## Segment 2 (score=0.0411)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None
+
+## Segment 3 (score=0.2394)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.enc
+
+## Segment 4 (score=0.3440)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way
+
+## Segment 5 (score=0.1459)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion
+
+## Segment 6 (score=0.0001)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a Py
+
+## Segment 7 (score=-0.0778)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a PyTorch Fairseq `Criterion`.
+
+To add this extension, you would have to copy the code for `CrossEntropyCriterion` and make your new class a derivative of `CrossEntropyCriterion`.
+
+```python
+class your_criterion_class:
+    def __init__(self, model, criterion_params):
+        self.model = model
+        self.criterion_params = criterion_params
+    
+    def __call__(self, sample):
+        model_inputs
+
+## Segment 8 (score=-0.0234)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a PyTorch Fairseq `Criterion`.
+
+To add this extension, you would have to copy the code for `CrossEntropyCriterion` and make your new class a derivative of `CrossEntropyCriterion`.
+
+```python
+class your_criterion_class:
+    def __init__(self, model, criterion_params):
+        self.model = model
+        self.criterion_params = criterion_params
+    
+    def __call__(self, sample):
+        model_inputs = self.model.encode_batch(
+            input_ids=sample['input_ids'],
+            attention_mask=sample['attention_mask'],
+            decoder_input_ids=sample['decoder_input_ids'],
+            decoder_attention_mask=sample['decoder_attention_mask'],
+            doc_labels=sample['doc_labels'],
+            tgt_vocab_size=self.criterion_params.tgt_vocab_size,
+            lc_enc
+
+## Segment 9 (score=0.0115)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a PyTorch Fairseq `Criterion`.
+
+To add this extension, you would have to copy the code for `CrossEntropyCriterion` and make your new class a derivative of `CrossEntropyCriterion`.
+
+```python
+class your_criterion_class:
+    def __init__(self, model, criterion_params):
+        self.model = model
+        self.criterion_params = criterion_params
+    
+    def __call__(self, sample):
+        model_inputs = self.model.encode_batch(
+            input_ids=sample['input_ids'],
+            attention_mask=sample['attention_mask'],
+            decoder_input_ids=sample['decoder_input_ids'],
+            decoder_attention_mask=sample['decoder_attention_mask'],
+            doc_labels=sample['doc_labels'],
+            tgt_vocab_size=self.criterion_params.tgt_vocab_size,
+            lc_encoder_input_ids=sample['lc_encoder_input_ids'],
+            lc_encoder_attention_mask=sample['lc_encoder_attention_mask'],
+            lc_decoder_input_ids=sample['lc_decoder_input_ids'],
+            lc_decoder_attention_mask=sample['lc_decoder_attention_mask'],
+        )
+        criterion_output = self.model(model_inputs)
+        return criterion
+
+## Segment 10 (score=-0.0101)
+I'm currently trying to extend [a model](https://github.com/microsoft/MASS) that is based on FairSeq/PyTorch. During training I need to train two encoders: one with the target sample, and the original one with the source sample. So the current forward function looks like this:
+```python
+def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+```
+And based on [this idea](https://github.com/golsun/SpaceFusion) I want something like this:
+```python
+def forward_test(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
+    return decoder_out
+
+def forward_train(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
+    encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+    autoencoder_out = self.encoder(tgt_tokens, src_lengths=src_lengths, **kwargs)
+    concat = some_concatination_func(encoder_out, autoencoder_out)
+    decoder_out = self.decoder(prev_output_tokens, encoder_out=concat, **kwargs)
+    return decoder_out
+```
+Is there any way to do this?
+
+Edit: These are the constraints that I have, since I need to extend *FairseqEncoderDecoderModel*:
+```python
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+```
+Edit 2: The parameters passed to the forward function in Fairseq can be altered by implementing your own Criterion, see for example [CrossEntropyCriterion](https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/cross_entropy.py#L28), where `sample['net_input']` is passed to the `__call__` function of the model, which invokes the `forward` method. 
+
+This is not a simple implementation detail in Mass, but rather a highly generic model interface. You can extend this class at any point, as long as you return a PyTorch Fairseq `Criterion`.
+
+To add this extension, you would have to copy the code for `CrossEntropyCriterion` and make your new class a derivative of `CrossEntropyCriterion`.
+
+```python
+class your_criterion_class:
+    def __init__(self, model, criterion_params):
+        self.model = model
+        self.criterion_params = criterion_params
+    
+    def __call__(self, sample):
+        model_inputs = self.model.encode_batch(
+            input_ids=sample['input_ids'],
+            attention_mask=sample['attention_mask'],
+            decoder_input_ids=sample['decoder_input_ids'],
+            decoder_attention_mask=sample['decoder_attention_mask'],
+            doc_labels=sample['doc_labels'],
+            tgt_vocab_size=self.criterion_params.tgt_vocab_size,
+            lc_encoder_input_ids=sample['lc_encoder_input_ids'],
+            lc_encoder_attention_mask=sample['lc_encoder_attention_mask'],
+            lc_decoder_input_ids=sample['lc_decoder_input_ids'],
+            lc_decoder_attention_mask=sample['lc_decoder_attention_mask'],
+        )
+        criterion_output = self.model(model_inputs)
+        return criterion_output.log_prob
+
+@register_model('transformer_mass')
+class TransformerMASSModel(FairseqEncoderDecoderModel):
+    def __init__(self, encoder, decoder):
+        super().__init__(encoder, decoder)
+    
+    def forward(self, tgt_tokens=None, **kwargs):
+        criterion = CrossEntropyCriterion(self, **self.criterion_params)
+        return super().forward(tgt_tokens, **kwargs)
+

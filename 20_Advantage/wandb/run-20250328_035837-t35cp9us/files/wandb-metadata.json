@@ -1,0 +1,67 @@
+{
+  "os": "Linux-6.8.0-52-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.9.21",
+  "startedAt": "2025-03-28T03:58:37.677497Z",
+  "args": [
+    "--log_with=wandb",
+    "--model_name",
+    "/home/exouser/Desktop/0_ModelCheckpoint/Full_RL_Model/CheckPoint_500",
+    "--reward_model_name",
+    "/home/exouser/Desktop/DeepSeek-R1-Distill-Qwen-7B",
+    "--tokenizer_name",
+    "/home/exouser/Desktop/Qwen2.5-3B-Instruct",
+    "--output_max_length",
+    "1024",
+    "--save_freq",
+    "20",
+    "--batch_size",
+    "8",
+    "--gradient_accumulation_steps",
+    "8",
+    "--ppo_epochs",
+    "4",
+    "--seed",
+    "42",
+    "--learning_rate",
+    "1.4e-5",
+    "--early_stopping",
+    "False",
+    "--output_dir",
+    "./my-rlhf-output",
+    "--steps",
+    "720"
+  ],
+  "program": "/home/exouser/Desktop/20_Advantage/Experiment.py",
+  "codePath": "Experiment.py",
+  "email": "kaizhuo2@illinois.edu",
+  "root": "/home/exouser/Desktop/20_Advantage",
+  "host": "fast",
+  "executable": "/home/exouser/miniconda3/envs/PPO/bin/python",
+  "codePathLocal": "Experiment.py",
+  "cpu_count": 32,
+  "cpu_count_logical": 32,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "532608356352",
+      "used": "359850512384"
+    }
+  },
+  "memory": {
+    "total": "123628265472"
+  },
+  "cpu": {
+    "count": 32,
+    "countLogical": 32
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA A100-SXM4-40GB",
+      "memoryTotal": "42949672960",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.2"
+}

@@ -1,0 +1,15 @@
+{"time":"2025-02-28T17:08:38.042588033Z","level":"INFO","msg":"stream: starting","core version":"0.19.4","symlink path":"/home/exouser/Desktop/16_Reward_GenerationLength/wandb/run-20250228_170837-ta58clcu/logs/debug-core.log"}
+{"time":"2025-02-28T17:08:38.146751774Z","level":"INFO","msg":"created new stream","id":"ta58clcu"}
+{"time":"2025-02-28T17:08:38.146873073Z","level":"INFO","msg":"stream: started","id":"ta58clcu"}
+{"time":"2025-02-28T17:08:38.14691426Z","level":"INFO","msg":"writer: Do: started","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:08:38.146941141Z","level":"INFO","msg":"handler: started","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:08:38.147027494Z","level":"INFO","msg":"sender: started","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:08:38.322538305Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-28T17:24:08.098255027Z","level":"INFO","msg":"stream: closing","id":"ta58clcu"}
+{"time":"2025-02-28T17:24:08.098379651Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-28T17:24:08.099536126Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-28T17:24:09.209380734Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-28T17:24:09.326115169Z","level":"INFO","msg":"handler: closed","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:24:09.326168459Z","level":"INFO","msg":"writer: Close: closed","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:24:09.32621139Z","level":"INFO","msg":"sender: closed","stream_id":"ta58clcu"}
+{"time":"2025-02-28T17:24:09.326429951Z","level":"INFO","msg":"stream: closed","id":"ta58clcu"}

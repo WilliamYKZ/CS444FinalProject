@@ -1,0 +1,56 @@
+Multi-Run Timing (10 runs, drop first 5, average last 5):
+
+Example 1_100:
+Prompt length = 27 tokens
+Averaged Generation Time = 5.023s
+Averaged Reward Time = 0.094s
+------------------------------------------------------------
+
+Example 2_500:
+Prompt length = 129 tokens
+Averaged Generation Time = 3.675s
+Averaged Reward Time = 0.126s
+------------------------------------------------------------
+
+Example 3_2000:
+Prompt length = 671 tokens
+Averaged Generation Time = 5.484s
+Averaged Reward Time = 0.315s
+------------------------------------------------------------
+
+Example 4_4000:
+Prompt length = 641 tokens
+Averaged Generation Time = 5.511s
+Averaged Reward Time = 0.314s
+------------------------------------------------------------
+
+Example 5_6000:
+Prompt length = 1865 tokens
+Averaged Generation Time = 6.374s
+Averaged Reward Time = 0.699s
+------------------------------------------------------------
+
+Example 6_8000:
+Prompt length = 1709 tokens
+Averaged Generation Time = 6.255s
+Averaged Reward Time = 0.656s
+------------------------------------------------------------
+
+Example 7_10000:
+Prompt length = 3534 tokens
+Averaged Generation Time = 7.672s
+Averaged Reward Time = 1.242s
+------------------------------------------------------------
+
+Example 8_12000:
+Prompt length = 3754 tokens
+Averaged Generation Time = 7.587s
+Averaged Reward Time = 1.325s
+------------------------------------------------------------
+
+Example 9_14000:
+Prompt length = 5113 tokens
+Averaged Generation Time = 8.684s
+Averaged Reward Time = 1.764s
+------------------------------------------------------------
+

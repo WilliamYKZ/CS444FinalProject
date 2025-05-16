@@ -1,0 +1,32 @@
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_setup.py:_flush():68] Current SDK version is 0.19.4
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_setup.py:_flush():68] Configure stats pid to 13913
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_setup.py:_flush():68] Loading settings from /home/exouser/.config/wandb/settings
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_setup.py:_flush():68] Loading settings from /home/exouser/Desktop/18_DifferentBatchSize/wandb/settings
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_init.py:setup_run_log_directory():624] Logging user logs to /home/exouser/Desktop/18_DifferentBatchSize/wandb/run-20250321_051533-bfoqf1ih/logs/debug.log
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_init.py:setup_run_log_directory():625] Logging internal logs to /home/exouser/Desktop/18_DifferentBatchSize/wandb/run-20250321_051533-bfoqf1ih/logs/debug-internal.log
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_init.py:init():743] calling init triggers
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_init.py:init():748] wandb.init called with sweep_config: {}
+config: {}
+2025-03-21 05:15:33,336 INFO    MainThread:13913 [wandb_init.py:init():776] starting backend
+2025-03-21 05:15:33,357 WARNING MainThread:13913 [wandb_init.py:init():1448] interrupted
+Traceback (most recent call last):
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 1444, in init
+    return wi.init(run_settings, run_config)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 779, in init
+    service = self._wl.ensure_service()
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/wandb_setup.py", line 280, in ensure_service
+    self._connection = service_connection.connect_to_service(self._settings)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/lib/service_connection.py", line 40, in connect_to_service
+    return _start_and_connect_service(settings)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/lib/service_connection.py", line 75, in _start_and_connect_service
+    proc.start()
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/service/service.py", line 232, in start
+    self._launch_server()
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/wandb/sdk/service/service.py", line 214, in _launch_server
+    internal_proc = subprocess.Popen(
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/subprocess.py", line 951, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/subprocess.py", line 1793, in _execute_child
+    part = os.read(errpipe_read, 50000)
+KeyboardInterrupt

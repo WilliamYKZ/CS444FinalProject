@@ -1,0 +1,19 @@
+{"time":"2025-03-03T14:46:14.278475578Z","level":"INFO","msg":"stream: starting","core version":"0.19.4","symlink path":"/home/exouser/Desktop/16_Reward_GenerationLength/wandb/run-20250303_144613-wntpz0xw/logs/debug-core.log"}
+{"time":"2025-03-03T14:46:14.383074082Z","level":"INFO","msg":"created new stream","id":"wntpz0xw"}
+{"time":"2025-03-03T14:46:14.383127734Z","level":"INFO","msg":"stream: started","id":"wntpz0xw"}
+{"time":"2025-03-03T14:46:14.383150186Z","level":"INFO","msg":"writer: Do: started","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T14:46:14.383173561Z","level":"INFO","msg":"handler: started","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T14:46:14.3832315Z","level":"INFO","msg":"sender: started","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T14:46:14.578457424Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-03T15:29:29.714165182Z","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/graphql\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"}
+{"time":"2025-03-03T18:42:22.057289918Z","level":"INFO","msg":"api: retrying HTTP error","status":500,"url":"https://api.wandb.ai/files/kaizhuo2-university-of-illinois-urbana-champaign/trl/wntpz0xw/file_stream","body":"{\"error\":\"context deadline exceeded\"}"}
+{"time":"2025-03-03T18:42:44.859228279Z","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/graphql\": net/http: request canceled (Client.Timeout exceeded while awaiting headers)"}
+{"time":"2025-03-03T19:03:14.877822778Z","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/graphql\": net/http: request canceled (Client.Timeout exceeded while awaiting headers)"}
+{"time":"2025-03-03T21:46:22.794850377Z","level":"INFO","msg":"stream: closing","id":"wntpz0xw"}
+{"time":"2025-03-03T21:46:22.795088376Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-03T21:46:22.796982955Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-03T21:46:23.110587824Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-03T21:46:23.209756054Z","level":"INFO","msg":"handler: closed","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T21:46:23.209835645Z","level":"INFO","msg":"writer: Close: closed","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T21:46:23.2098597Z","level":"INFO","msg":"sender: closed","stream_id":"wntpz0xw"}
+{"time":"2025-03-03T21:46:23.210029Z","level":"INFO","msg":"stream: closed","id":"wntpz0xw"}

@@ -1,0 +1,309 @@
+# Full Generated Response
+
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(sibling)
+        sibling = sibling.find_next_sibling()
+
+    # Process lis
+    # ...
+```
+
+In the above code, `soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")` is used to select all `h2`, `h3`, `h4` elements that follow the `#toc` element in the HTML. Then, for each pair of consecutive headers, it finds all `li` elements between them by iterating over the siblings of the first header until the second header is reached.
+
+You can replace the `#...` line with the processing you want to do with the `li` elements.
+
+Please note that this code is in Python, not VBA. However, the approach should be applicable in VBA as well. You just need to use a library that can parse HTML and make HTTP requests, and translate the Python code into VBA code.
+
+## Segment 1 (score=-0.9775)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML
+
+## Segment 2 (score=-0.2239)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and
+
+## Segment 3 (score=0.0451)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+
+## Segment 4 (score=0.2047)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3
+
+## Segment 5 (score=0.4277)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between
+
+## Segment 6 (score=0.6323)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(
+
+## Segment 7 (score=0.5850)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(sibling)
+        sibling = sibling.find_next_sibling()
+
+    # Process lis
+    # ...
+```
+
+In the above code, `soup.select("#toc ~ h
+
+## Segment 8 (score=0.6489)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(sibling)
+        sibling = sibling.find_next_sibling()
+
+    # Process lis
+    # ...
+```
+
+In the above code, `soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")` is used to select all `h2`, `h3`, `h4` elements that follow the `#toc` element in the HTML. Then, for each
+
+## Segment 9 (score=0.6719)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(sibling)
+        sibling = sibling.find_next_sibling()
+
+    # Process lis
+    # ...
+```
+
+In the above code, `soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")` is used to select all `h2`, `h3`, `h4` elements that follow the `#toc` element in the HTML. Then, for each pair of consecutive headers, it finds all `li` elements between them by iterating over the siblings of the first header until the second header is reached.
+
+You can replace the `#...` line with the processing you want to do with
+
+## Segment 10 (score=0.6709)
+To solve your problem, you can use the following approach:
+
+1. Parse the HTML of the page.
+2. Find all the heading elements (`h2`, `h3`, `h4` etc.) in the parsed HTML.
+3. Loop through each heading element. For each heading element, find the `li` elements that follow it until the next heading element is encountered.
+
+Here is a sample Python code that uses BeautifulSoup to parse the HTML and implement the above approach:
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://de.wikipedia.org/wiki/1._Januar"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all h2, h3, h4 elements
+headers = soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")
+
+for i in range(len(headers) - 1):
+    start = headers[i]
+    end = headers[i+1]
+
+    # Find all li elements between start and end
+    lis = []
+    sibling = start.find_next_sibling()
+    while sibling != end:
+        if sibling.name == "li":
+            lis.append(sibling)
+        sibling = sibling.find_next_sibling()
+
+    # Process lis
+    # ...
+```
+
+In the above code, `soup.select("#toc ~ h2, #toc ~ h3, #toc ~ h4")` is used to select all `h2`, `h3`, `h4` elements that follow the `#toc` element in the HTML. Then, for each pair of consecutive headers, it finds all `li` elements between them by iterating over the siblings of the first header until the second header is reached.
+
+You can replace the `#...` line with the processing you want to do with the `li` elements.
+
+Please note that this code is in Python, not VBA. However, the approach should be applicable in VBA as well. You just need to use a library that can parse HTML and make HTTP requests, and translate the Python code into VBA code.
+

@@ -1,0 +1,28 @@
+Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:18<00:00,  9.05s/it]
+Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at /home/exouser/Desktop/DeepSeek-R1-Distill-Qwen-7B and are newly initialized: ['score.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Device set to use cuda:0
+0it [00:00, ?it/s]You're using a Qwen2TokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/transformers/pipelines/text_classification.py:106: UserWarning: `return_all_scores` is now deprecated,  if want a similar functionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
+  warnings.warn(
+0it [01:34, ?it/s]
+Traceback (most recent call last):
+  File "/home/exouser/Desktop/20_Advantage/Experiment.py", line 232, in <module>
+    ppo_trainer.log_stats(stats, batch, rewards)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/contextlib.py", line 79, in inner
+    return func(*args, **kwds)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/trl/trainer/ppo_trainer.py", line 680, in step
+    queries, responses, scores, response_masks = self._step_safety_checker(
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/trl/trainer/ppo_trainer.py", line 631, in _step_safety_checker
+    raise ValueError(f"{name} must be a list of tensors - got {type(tensor_list)}")
+ValueError: responses must be a list of tensors - got <class 'torch.Tensor'>
+Traceback (most recent call last):
+  File "/home/exouser/Desktop/20_Advantage/Experiment.py", line 232, in <module>
+    ppo_trainer.log_stats(stats, batch, rewards)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/contextlib.py", line 79, in inner
+    return func(*args, **kwds)
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/trl/trainer/ppo_trainer.py", line 680, in step
+    queries, responses, scores, response_masks = self._step_safety_checker(
+  File "/home/exouser/miniconda3/envs/PPO/lib/python3.9/site-packages/trl/trainer/ppo_trainer.py", line 631, in _step_safety_checker
+    raise ValueError(f"{name} must be a list of tensors - got {type(tensor_list)}")
+ValueError: responses must be a list of tensors - got <class 'torch.Tensor'>

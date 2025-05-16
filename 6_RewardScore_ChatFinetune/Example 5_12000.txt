@@ -1,0 +1,1973 @@
+# Full Generated Response
+
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invoke(Method.java:491)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:841)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:599)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.NativeStart.main(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:441)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:481)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:493)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:326)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:263)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceManager.inflateFromResource(PreferenceManager.java:269)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceActivity.addPreferencesFromResource(PreferenceActivity.java:1333)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.example.ebookreader.SettingsActivity.onCreate(SettingsActivity.java:31)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1048)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1700)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 11 more
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: java.lang.ClassNotFoundException: android.preference.ListViewPreference in loader dalvik.system.PathClassLoader[/data/app/com.example.ebookreader-2.apk]
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.PathClassLoader.findClass(PathClassLoader.java:251)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:548)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:508)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItem(GenericInflater.java:375)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.onCreateItem(GenericInflater.java:417)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:428)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 20 more
+```
+
+Any help would be greatly appreciated. Please let me know if you need any further information.
+
+---
+
+Here are some code examples with how the `ListViewPreference` class is inflated:
+```java
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+```xml
+<ListViewPreference
+    android:id="@+id/listViewPrefBarContainer"
+    android:key="listViewPrefBarContainer"
+    android:title="List View Preference" />
+```
+
+I believe that I should try creating a custom constructor that includes `PreferenceFragment`, but I'm not certain if this will help, as it is just a wild guess. I would be more than happy to give up all the data in my `ListViewPreference` class, including `ListViewPreference`, `ListViewPreferencePrivate`, and `ListViewPreferencePrivate`, if you believe this will help resolve the problem. I have attached all of the source code in the above paste bin link so you can see for yourself the magnitude of the issue, and why no one is saying, "It works for most people", like on the android forum! You can then go through the code examples and create the missing `PreferencePrivate()` method like you would a `PreferencePrivate()` method called `PreferencePrivate()` and make sure that no data is lost when it is recreated. But for this part, no matter what I do, I see the "No such" error every time it is a "no such resource" found error. Please help a "for" me get "Preference" me a solution.
+I'd love to hear from you, please do not use, the solution is
+
+## Segment 1 (score=-0.1791)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private
+
+## Segment 2 (score=0.5493)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout =
+
+## Segment 3 (score=0.7886)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView)
+
+## Segment 4 (score=0.9019)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+       
+
+## Segment 5 (score=0.9077)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader
+
+## Segment 6 (score=0.7104)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.
+
+## Segment 7 (score=0.5776)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invoke(Method.java:491)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:841)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:599)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.NativeStart.main(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:441)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:481)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:493)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.Generic
+
+## Segment 8 (score=0.4888)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invoke(Method.java:491)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:841)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:599)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.NativeStart.main(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:441)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:481)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:493)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:326)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:263)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceManager.inflateFromResource(PreferenceManager.java:269)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceActivity.addPreferencesFromResource(PreferenceActivity.java:1333)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.example.ebookreader.SettingsActivity.onCreate(SettingsActivity.java:31)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1048)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1700)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 11 more
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: java.lang.ClassNotFoundException: android.preference.ListViewPreference in loader dalvik.system.PathClassLoader[/data/app/com.example.ebookreader
+
+## Segment 9 (score=0.4458)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invoke(Method.java:491)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:841)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:599)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.NativeStart.main(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:441)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:481)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:493)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:326)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:263)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceManager.inflateFromResource(PreferenceManager.java:269)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceActivity.addPreferencesFromResource(PreferenceActivity.java:1333)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.example.ebookreader.SettingsActivity.onCreate(SettingsActivity.java:31)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1048)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1700)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 11 more
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: java.lang.ClassNotFoundException: android.preference.ListViewPreference in loader dalvik.system.PathClassLoader[/data/app/com.example.ebookreader-2.apk]
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.PathClassLoader.findClass(PathClassLoader.java:251)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:548)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:508)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItem(GenericInflater.java:375)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.onCreateItem(GenericInflater.java:417)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:428)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 20 more
+```
+
+Any help would be greatly appreciated. Please let me know if you need any further information.
+
+---
+
+Here are some code examples with how the `ListViewPreference` class is inflated:
+```java
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.
+
+## Segment 10 (score=0.3052)
+Problem Description:
+--------------------
+OK now I know that this question has been asked before several times on SO but none of the answers have worked for me. I am attempting to create a custom preference for my project. More specifically it is a preference with a [`HorizontalListView`](http://www.dev-smart.com/archives/34) attached directly underneath it. I basically created it by modifying [this code](http://robobunny.com/wp/2011/08/13/android-seekbar-preference/) for a `SeekBarPreference` (which I am also using and is working fine). My `ListViewPreference` is located in exactly the same folder as the `SeekBarPreference` (which, as I said is having no problem) but I am constantly getting a `ClassNotFoundException` (see logcat below). Here is my `ListViewPreference` class:
+
+```java
+package com.example.ebookreader;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.preference.Preference;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class ListViewPreference extends Preference {
+    private final String TAG = getClass().getName();
+    private static final String ROBOBUNNYNS = "http://robobunny.com";
+    private static final int DEFAULT_VALUE = 50;
+    private int mCurrentValue;
+    private String mUnitsLeft = "";
+    private String mUnitsRight = "";
+    private HorizontalListView mListView;
+    private TextView mStatusText;
+
+    public ListViewPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initPreference(context, attrs);
+    }
+
+    public ListViewPreference(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initPreference(context, attrs);
+    }
+
+    private void initPreference(Context context, AttributeSet attrs) {
+        setValuesFromXml(attrs);
+        mListView = new HorizontalListView(context, attrs);
+        LayoutParams params = mListView.getLayoutParams();
+        params.width = LayoutParams.MATCH_PARENT;
+        params.height = LayoutParams.WRAP_CONTENT;
+        mListView.setLayoutParams(params);
+    }
+
+    private void setValuesFromXml(AttributeSet attrs) {
+        mUnitsLeft = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsLeft", "");
+        String units = getAttributeStringValue(attrs, ROBOBUNNYNS, "units", "");
+        mUnitsRight = getAttributeStringValue(attrs, ROBOBUNNYNS, "unitsRight", units);
+    }
+
+    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name, String defaultValue) {
+        String value = attrs.getAttributeValue(namespace, name);
+        if (value == null) value = defaultValue;
+        return value;
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        RelativeLayout layout = null;
+        try {
+            LayoutInflater mInflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layout = (RelativeLayout) mInflater.inflate(
+                R.layout.horizontal_list_view_preference, parent, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating seek bar preference", e);
+        }
+        return layout;
+    }
+
+    @Override
+    public void onBindView(View view) {
+        super.onBindView(view);
+        try {
+            // move our seekbar to the new view we've been given
+            ViewParent oldContainer = mListView.getParent();
+            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.listViewPrefBarContainer);
+            if (oldContainer != newContainer) {
+                // remove the seekbar from the old view
+                if (oldContainer != null) {
+                    ((ViewGroup) oldContainer).removeView(mListView);
+                }
+                // remove the existing seekbar (there may not be one) and add ours
+                newContainer.removeAllViews();
+                newContainer.addView(mListView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error binding view: " + ex.toString());
+        }
+        updateView(view);
+    }
+
+    /**
+     * Update a SeekBarPreference view with our current state
+     *
+     * @param view
+     */
+    protected void updateView(View view) {
+        try {
+            RelativeLayout layout = (RelativeLayout) view;
+            mStatusText = (TextView) layout.findViewById(R.id.listViewPrefValue);
+            mStatusText.setText(String.valueOf(mCurrentValue));
+            mStatusText.setMinimumWidth(30);
+            TextView unitsRight = (TextView) layout.findViewById(R.id.listViewPrefUnitsRight);
+            unitsRight.setText(mUnitsRight);
+            TextView unitsLeft = (TextView) layout.findViewById(R.id.listViewPrefUnitsLeft);
+            unitsLeft.setText(mUnitsLeft);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating seek bar preference", e);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray ta, int index) {
+        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
+        return defaultValue;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            mCurrentValue = getPersistedInt(mCurrentValue);
+        } else {
+            int temp = 0;
+            try {
+                temp = (Integer) defaultValue;
+            } catch (Exception ex) {
+                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+            }
+            persistInt(temp);
+            mCurrentValue = temp;
+        }
+    }
+}
+```
+
+For most people this problem is the result of not having a constructor with parameters `Context` and `AttributeSet` but as you can see, I clearly have it. Here is my XML file where the error keeps on occurring:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <android:CheckBoxPreference
+            android:key="wifi"
+            android:summary="Enable or Disable Wi-Fi"
+            android:title="Wi-Fi" />
+
+        <android:CheckBoxPreference
+            android:key="bluetooth"
+            android:summary="Enable or Disable Bluetooth"
+            android:title="Bluetooth" />
+
+        <android:CheckBoxPreference
+            android:key="autosync"
+            android:summary="Enable or Disable AutoSync"
+            android:title="AutoSync" />
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:defaultValue="100"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+
+    <android:PreferenceCategory
+        android:key="account_settings"
+        android:title="Account Settings" >
+
+        <custom:ListViewPreference
+            android:id="@+id/font_selector"
+            android:key="font"
+            android:title="Font"
+            android:summary="Edit Font" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+Below is my full Logcat:
+
+```text
+03-14 17:53:14.290: E/AndroidRuntime(449): FATAL EXCEPTION: main
+03-14 17:53:14.290: E/AndroidRuntime(449): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.example.ebookreader/com.example.ebookreader.SettingsActivity}: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1736)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1752)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.access$1500(ActivityThread.java:123)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:993)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Handler.dispatchMessage(Handler.java:99)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.os.Looper.loop(Looper.java:126)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.main(ActivityThread.java:3997)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invokeNative(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.reflect.Method.invoke(Method.java:491)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:841)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:599)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.NativeStart.main(Native Method)
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: android.view.InflateException: Binary XML file line #40: Error inflating class ListViewPreference
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:441)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:481)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.rInflate(GenericInflater.java:493)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:326)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.inflate(GenericInflater.java:263)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceManager.inflateFromResource(PreferenceManager.java:269)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.PreferenceActivity.addPreferencesFromResource(PreferenceActivity.java:1333)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at com.example.ebookreader.SettingsActivity.onCreate(SettingsActivity.java:31)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1048)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1700)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 11 more
+03-14 17:53:14.290: E/AndroidRuntime(449): Caused by: java.lang.ClassNotFoundException: android.preference.ListViewPreference in loader dalvik.system.PathClassLoader[/data/app/com.example.ebookreader-2.apk]
+03-14 17:53:14.290: E/AndroidRuntime(449):     at dalvik.system.PathClassLoader.findClass(PathClassLoader.java:251)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:548)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at java.lang.ClassLoader.loadClass(ClassLoader.java:508)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItem(GenericInflater.java:375)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.onCreateItem(GenericInflater.java:417)
+03-14 17:53:14.290: E/AndroidRuntime(449):     at android.preference.GenericInflater.createItemFromTag(GenericInflater.java:428)
+03-14 17:53:14.290: E/AndroidRuntime(449):     ... 20 more
+```
+
+Any help would be greatly appreciated. Please let me know if you need any further information.
+
+---
+
+Here are some code examples with how the `ListViewPreference` class is inflated:
+```java
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.ebookreader"
+    android:background="@drawable/wallpaper" >
+
+    <android:PreferenceCategory
+        android:key="device_settings"
+        android:title="Device Settings" >
+
+        <custom:SeekBarPreference
+            android:id="@+id/brightness_adjust"
+            android:key="brightness"
+            android:max="200"
+            android:summary="Adjust Brightness Levels"
+            android:title="Brightness" />
+    </android:PreferenceCategory>
+</PreferenceScreen>
+```
+
+```xml
+<ListViewPreference
+    android:id="@+id/listViewPrefBarContainer"
+    android:key="listViewPrefBarContainer"
+    android:title="List View Preference" />
+```
+
+I believe that I should try creating a custom constructor that includes `PreferenceFragment`, but I'm not certain if this will help, as it is just a wild guess. I would be more than happy to give up all the data in my `ListViewPreference` class, including `ListViewPreference`, `ListViewPreferencePrivate`, and `ListViewPreferencePrivate`, if you believe this will help resolve the problem. I have attached all of the source code in the above paste bin link so you can see for yourself the magnitude of the issue, and why no one is saying, "It works for most people", like on the android forum! You can then go through the code examples and create the missing `PreferencePrivate()` method like you would a `PreferencePrivate()` method called `PreferencePrivate()` and make sure that no data is lost when it is recreated. But for this part, no matter what I do, I see the "No such" error every time it is a "no such resource" found error. Please help a "for" me get "Preference" me a solution.
+I'd love to hear from you, please do not use, the solution is
+
